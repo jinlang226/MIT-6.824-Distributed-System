@@ -22,8 +22,27 @@ type ExampleReply struct {
 	Y int
 }
 
-// Add your RPC definitions here.
+type JobTypeArgs int
 
+// Add your RPC definitions here.
+const (
+	MsgAskTaskRPC      JobTypeArgs = 0
+	MsgFinishMapRPC    JobTypeArgs = 2
+	MsgFinishReduceRPC JobTypeArgs = 3
+)
+
+type MsgArgs struct {
+	JobTypeArgs JobTypeArgs
+	Msg         string
+	TaskID      int
+}
+
+type MsgReply struct {
+	FileName     string
+	NMap         int
+	NReduce      int
+	JobTypeReply string
+}
 
 // Cook up a unique-ish UNIX-domain socket name
 // in /var/tmp, for the master.
