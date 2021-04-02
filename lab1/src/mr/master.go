@@ -2,6 +2,7 @@ package mr
 
 import (
 	"log"
+	"strconv"
 	"sync"
 )
 import "net"
@@ -13,10 +14,11 @@ type Master struct {
 	// Your definitions here.
 	FilesName         map[string]int //key: input file name, val: file status
 	ReduceTasksStatus map[int]int    //key: reduce task number, val: reduce task status
-	NMap              int
+	CurrMap           int
 	NReduce           int
 	MapFinished       bool
 	ReduceFinished    bool
+	InterFileName     [][]string
 	Mutex             *sync.RWMutex
 }
 
@@ -31,19 +33,46 @@ var mapTasks chan string
 var reduceTasks chan int
 
 // Your code here -- RPC handlers for the worker to call.
-func (m *Master) HandlerRPC(args *MsgArgs, reply *MsgReply) err {
+func (m *Master) HandlerRPC(args *MsgArgs, reply *MsgReply) error {
 	jobType := args.JobTypeArgs
 	switch jobType {
 	case MsgAskTaskRPC:
 		select {
 		case fileName := <-mapTasks:
 			reply.FileName = fileName
-			reply.
+			reply.CurrMap = m.CurrMap
+			reply.NReduce = m.NReduce
+			reply.JobTypeReply = "map"
+			m.FilesName[fileName] = Assigned
+			m.CurrMap++
+			go m.workerTime()
+			return nil
 		case reduceTask := <-reduceTasks:
-
+			reply.JobTypeReply = "reduce"
+			reply.NReduce = m.NReduce
+			reply.CurrReduce = reduceTask
+			reply.InterFileName = m.InterFileName[reduceTask]
+			m.ReduceTasksStatus[reduceTask] = Assigned
+			go m.workerTime()
+			return nil
 		}
+	case MsgFinishMapRPC:
+		m.FilesName[args.Msg] = Finished
+	case MsgFinishReduceRPC:
+		reduceIntex, _ := strconv.Atoi(args.Msg)
+		m.ReduceTasksStatus[reduceIntex] = Finished
 	}
 	return nil
+}
+
+func (m *Master) workerTime() {
+
+}
+
+func(m *Master) HandlerInterFileRPC(args *MsgArgs, reply *MsgReply) {
+	reduceNum := args.TaskID
+	fileName := args.Msg
+	m.InterFileName[reduceNum] = append(m.InterFileName[reduceNum], fileName)
 }
 
 //
@@ -102,10 +131,11 @@ func MakeMaster(files []string, nReduce int) *Master {
 	// Your code here.
 	m.FilesName = make(map[string]int)
 	m.ReduceTasksStatus = make(map[int]int)
-	m.NMap = 0
+	m.CurrMap = 0
 	m.NReduce = nReduce
 	m.MapFinished = false
 	m.ReduceFinished = false
+	m.InterFileName = make([][]string, m.NReduce)
 	m.Mutex = new(sync.RWMutex)
 
 	for _, file := range files {

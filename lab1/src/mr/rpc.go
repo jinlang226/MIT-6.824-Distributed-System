@@ -29,6 +29,7 @@ const (
 	MsgAskTaskRPC      JobTypeArgs = 0
 	MsgFinishMapRPC    JobTypeArgs = 2
 	MsgFinishReduceRPC JobTypeArgs = 3
+	MsgInterFile       JobTypeArgs = 4  //send intermediate file location to master
 )
 
 type MsgArgs struct {
@@ -38,10 +39,12 @@ type MsgArgs struct {
 }
 
 type MsgReply struct {
-	FileName     string
-	NMap         int
-	NReduce      int
-	JobTypeReply string
+	FileName      string
+	CurrMap       int
+	NReduce       int
+	CurrReduce    int
+	JobTypeReply  string
+	InterFileName []string
 }
 
 // Cook up a unique-ish UNIX-domain socket name
