@@ -14,7 +14,7 @@
 * c4 -> Rx
 
 ## Bad Repel Design
-
+later reading
 
 # GFS
 * Big, fast
@@ -28,6 +28,7 @@
 Not gaurantee correct data, but performance
 
 ## Master Data
+* (Non-volatile memory (NVM) or non-volatile storage is a type of computer memory that can retain stored information even after power is removed. In contrast, volatile memory needs constant power in order to retain data.)
 * file name -> array of chunk (64 megaByte?bits) handles (on disk, nv, Non-Volatile CACHE)
 * handle -> 
     * list of chunk servers(not writen in the disk, v), 
