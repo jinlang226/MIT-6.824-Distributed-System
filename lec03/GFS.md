@@ -50,4 +50,7 @@ Not gaurantee correct data, but performance
 4. Then tells P, S, V# -- lease(60s)
 5. M write its v# to the disk after telling the disk
 6. Primary picks offset. All replicas told to write at offeset
-7. if all of then "yes", then primary reply success to the client; else no to client
+7. if all of secondary reply "yes", then primary reply success to the client; else no to client
+
+### avoid split brain
+lease
